@@ -343,7 +343,7 @@ private struct ChildScrollViewInfo {
         ]
         
         let landscapeConstraints = [
-            self.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            self.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor, constant: -view.layoutMargins.left),
             self.widthAnchor.constraint(equalToConstant: 320),
         ]
         
@@ -1045,6 +1045,11 @@ private struct ChildScrollViewInfo {
 
     private func opacityFactor(for position: DrawerPosition) -> CGFloat? {
         let topmost = (self.topmostPosition ?? .closed).rawValue
+        
+        // Hide overlay when in landscape
+        if let superview, superview.isLandscape {
+            return 0
+        }
 
         switch (position, overlayVisibilityBehavior) {
         case (_, .disabled):
