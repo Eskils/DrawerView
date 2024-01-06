@@ -342,8 +342,15 @@ private struct ChildScrollViewInfo {
             self.trailingAnchor.constraint(equalTo: view.trailingAnchor),
         ]
         
+        let landscapeLeadingAnchor: NSLayoutConstraint
+        if #available(iOS 11.0, *) {
+            landscapeLeadingAnchor = self.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor)
+        } else {
+            landscapeLeadingAnchor = self.leadingAnchor.constraint(equalTo: view.leadingAnchor)
+        }
+        
         let landscapeConstraints = [
-            self.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor, constant: -view.layoutMargins.left),
+            landscapeLeadingAnchor,
             self.widthAnchor.constraint(equalToConstant: 320),
         ]
         
