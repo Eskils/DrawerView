@@ -330,22 +330,36 @@ private struct ChildScrollViewInfo {
             log("Invalid state; superview already set when called attachTo(view:)")
         }
 
-        topConstraint = self.topAnchor.constraint(equalTo: view.topAnchor, constant: self.topMargin)
-        heightConstraint = self.heightAnchor.constraint(greaterThanOrEqualTo: view.heightAnchor, multiplier: 1, constant: -self.topSpace)
+        let topConstraint = self.topAnchor.constraint(equalTo: view.topAnchor, constant: self.topMargin)
+        let heightConstraint = self.heightAnchor.constraint(greaterThanOrEqualTo: view.heightAnchor, multiplier: 1, constant: -self.topSpace)
         let bottomConstraint = self.bottomAnchor.constraint(greaterThanOrEqualTo: view.bottomAnchor)
-
-        let constraints = [
+        
+        self.topConstraint = topConstraint
+        self.heightConstraint = heightConstraint
+        
+        let portraitConstraints = [
             self.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             self.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+        ]
+        
+        let landscapeConstraints = [
+            self.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor),
+            self.widthAnchor.constraint(equalToConstant: 320),
+        ]
+        
+        self.landscapeConstraints = landscapeConstraints
+        self.portraitConstraints = portraitConstraints
+
+        let generalConstraints = [
             topConstraint,
             heightConstraint,
             bottomConstraint
         ]
 
-        for constraint in constraints {
-            constraint?.isActive = true
-        }
-
+        NSLayoutConstraint.activate(generalConstraints)
+        
+        updateOrientationBasedConstraints()
+        
         setNeedsRespositioning()
         updateVisuals()
     }
@@ -418,6 +432,10 @@ private struct ChildScrollViewInfo {
     private var topConstraint: NSLayoutConstraint? = nil
 
     private var heightConstraint: NSLayoutConstraint? = nil
+    
+    private var landscapeConstraints: [NSLayoutConstraint]?
+    
+    private var portraitConstraints: [NSLayoutConstraint]?
 
     fileprivate var childScrollViews: [ChildScrollViewInfo] = []
 
@@ -605,6 +623,7 @@ private struct ChildScrollViewInfo {
 
         if self.orientationChanged || needsRespositioning {
             self.updateSnapPosition(animated: false)
+            updateOrientationBasedConstraints()
             self.orientationChanged = false
             needsRespositioning = false
         }
@@ -736,6 +755,24 @@ private struct ChildScrollViewInfo {
     private func updateSnapPosition(animated: Bool) {
         if panGestureRecognizer.state.isTracking == false {
             self.setPosition(currentPosition, animated: animated)
+        }
+    }
+    
+    private func updateOrientationBasedConstraints() {
+        guard
+            let landscapeConstraints = landscapeConstraints,
+            let portraitConstraints = portraitConstraints,
+            let view = superview
+        else {
+            return
+        }
+        
+        if view.isLandscape {
+            NSLayoutConstraint.deactivate(portraitConstraints)
+            NSLayoutConstraint.activate(landscapeConstraints)
+        } else {
+            NSLayoutConstraint.deactivate(landscapeConstraints)
+            NSLayoutConstraint.activate(portraitConstraints)
         }
     }
 
