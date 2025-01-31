@@ -348,6 +348,7 @@ private struct ChildScrollViewInfo {
         } else {
             landscapeLeadingAnchor = self.leadingAnchor.constraint(equalTo: view.leadingAnchor)
         }
+        self.landscapeLeadingAnchor = landscapeLeadingAnchor
         
         let landscapeConstraints = [
             landscapeLeadingAnchor,
@@ -443,6 +444,8 @@ private struct ChildScrollViewInfo {
     private var landscapeConstraints: [NSLayoutConstraint]?
     
     private var portraitConstraints: [NSLayoutConstraint]?
+    
+    private var landscapeLeadingAnchor: NSLayoutConstraint?
 
     fileprivate var childScrollViews: [ChildScrollViewInfo] = []
 
@@ -775,9 +778,15 @@ private struct ChildScrollViewInfo {
         }
         
         if view.isLandscape {
+            if view.traitCollection.horizontalSizeClass == .regular {
+                landscapeLeadingAnchor?.constant = 32
+            } else {
+                landscapeLeadingAnchor?.constant = 0
+            }
             NSLayoutConstraint.deactivate(portraitConstraints)
             NSLayoutConstraint.activate(landscapeConstraints)
         } else {
+            landscapeLeadingAnchor?.constant = 0
             NSLayoutConstraint.deactivate(landscapeConstraints)
             NSLayoutConstraint.activate(portraitConstraints)
         }
