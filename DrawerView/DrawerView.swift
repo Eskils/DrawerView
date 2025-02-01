@@ -778,13 +778,13 @@ private struct ChildScrollViewInfo {
         }
         
         if view.isLandscape {
+            NSLayoutConstraint.deactivate(portraitConstraints)
+            NSLayoutConstraint.activate(landscapeConstraints)
             if view.traitCollection.horizontalSizeClass == .regular {
                 landscapeLeadingAnchor?.constant = 32
             } else {
                 landscapeLeadingAnchor?.constant = 0
             }
-            NSLayoutConstraint.deactivate(portraitConstraints)
-            NSLayoutConstraint.activate(landscapeConstraints)
         } else {
             landscapeLeadingAnchor?.constant = 0
             NSLayoutConstraint.deactivate(landscapeConstraints)
@@ -1131,6 +1131,10 @@ private struct ChildScrollViewInfo {
             if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
                 updateVisuals()
             }
+        }
+        
+        if traitCollection.horizontalSizeClass != previousTraitCollection?.horizontalSizeClass {
+            handleOrientationChange()
         }
     }
 

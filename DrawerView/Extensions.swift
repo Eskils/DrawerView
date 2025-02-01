@@ -27,6 +27,7 @@ extension UIView {
     
     var isLandscape: Bool {
         self.frame.width >= self.frame.height
+        || self.traitCollection.horizontalSizeClass == .regular
     }
     
 }
